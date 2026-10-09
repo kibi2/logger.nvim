@@ -9,7 +9,7 @@ lua << EOF
 		buffer_name = "kibi2://log",
 		use_timestamp = true,
 		probe = true,
-		monitor = true,
+		monitor = false,
   	},
   }
   require("kibi2.config").setup(opts)
