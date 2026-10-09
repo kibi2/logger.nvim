@@ -30,17 +30,17 @@ CASE log.xxx(...)
 
 let bufnr = -1
 for buf in getbufinfo()
-  " echomsg buf.name
   if buf.name =~# 'kibi2://log'
     let bufnr = buf.bufnr
     break
   endif
 endfor
 
-" echomsg bufnr
 let lines = bufnr > 0 ? getbufline(bufnr, 1, '$') : []
 for line in lines
-	echomsg line
+  if line !~# '^\s*$'
+    echomsg line
+  endif
 endfor
 
 call Snapshot({})

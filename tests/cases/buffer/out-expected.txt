@@ -1,7 +1,6 @@
 === MESSAGE ===
  
 --- CASE 19: log.xxx(...) ---
-
 [KB2][+0ms][ERROR][[string ":lua"]] error
 [KB2][+0ms][WARN][[string ":lua"]] <boolean> true
 [KB2][+0ms][DEBUG][[string ":lua"]] 400000000
