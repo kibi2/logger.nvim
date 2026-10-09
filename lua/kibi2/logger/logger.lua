@@ -2,7 +2,7 @@ local api = vim.api -- Neovim
 local bo = vim.bo
 local fn = vim.fn
 
-local config = require("kibi2.config")
+local config = require("kibi2.logger.config")
 
 -- =============================================================================
 
