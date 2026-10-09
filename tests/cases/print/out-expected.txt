@@ -1,0 +1,11 @@
+=== MESSAGE ===
+ 
+--- CASE 17: log.xxx(...) ---
+[KB2][+0ms][ERROR][[string ":lua"]] error
+[KB2][+0ms][WARN][[string ":lua"]] <boolean> true
+[KB2][+0ms][DEBUG][[string ":lua"]] 400000000
+[KB2][+0ms][🟧PRB][[string ":lua"] 1] -0.003
+[KB2][+2ms][CATEGORY][[string ":lua"]] format 38 foo
+
+=== DISPLAY ===
+

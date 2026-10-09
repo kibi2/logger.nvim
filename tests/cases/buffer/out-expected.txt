@@ -1,0 +1,15 @@
+=== MESSAGE ===
+ 
+--- CASE 19: log.xxx(...) ---
+
+[KB2][+0ms][2:1(+1)MB][ERROR][[string ":lua"]] error
+[KB2][+0ms][2:1(+1)MB][WARN][[string ":lua"]] <boolean> true
+[KB2][+0ms][2:1(+1)MB][DEBUG][[string ":lua"]] 400000000
+[KB2][+0ms][2:1(+1)MB][🟧PRB][[string ":lua"] 1] -0.003
+[KB2][+2ms][2:1(+1)MB][CATEGORY][[string ":lua"]] format 38 foo
+[KB2][+0ms][2:1(+1)MB][INFO][[string ":lua"]] <table> { "CATEGORY", "format %d %s", 38, "foo" }
+[KB2][+0ms][2:1(+1)MB][WARN][[string ":lua"]] CATEGORY
+[KB2][+0ms][2:1(+1)MB][DEBUG][[string ":lua"]] test no =  1003
+
+=== DISPLAY ===
+

@@ -1,0 +1,11 @@
+*.swp
+*.log
+.DS_Store
+doc/tags
+
+.luarc.private.json
+
+# coverage
+luacov.stats.out
+luacov.report.out
+luacov.report.html

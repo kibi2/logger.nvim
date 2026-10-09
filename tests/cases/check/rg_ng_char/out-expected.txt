@@ -1,0 +1,1 @@
+/Users/ogawa/oss/logger.nvim/lua/kibi2/logger.lua:		name = "🟧PRB"

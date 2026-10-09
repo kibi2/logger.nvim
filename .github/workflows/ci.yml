@@ -1,0 +1,86 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+    tags:
+      - "v*"
+
+jobs:
+  test:
+    name: Test (Neovim ${{ matrix.nvim }})
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        nvim:
+          - stable
+          # - nightly  # Temporarily disabled: Lua print() is not recorded in :messages on Nightly.
+          - v0.10.0
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Neovim
+        uses: rhysd/action-setup-vim@v1
+        with:
+          neovim: true
+          version: ${{ matrix.nvim }}
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.x"
+
+      - name: Install system packages
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y jq luarocks
+
+      - name: Install LuaRocks & LuaCov
+        run: |
+          luarocks install --local luacov
+          luarocks install --local luacov-html
+          eval "$(luarocks path --bin)"
+
+      - name: Show versions
+        run: |
+          nvim --version
+          lua -v || true
+
+      - name: Run tests
+        run: |
+          chmod +x tests/run.sh
+          tests/run.sh
+
+      - name: Upload diff artifacts (on failure)
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-diffs-${{ matrix.nvim }}
+          path: |
+            tests/cases/**/diff-*.txt
+            tests/stdout.txt
+            tests/stderr.txt
+
+      - name: Generate coverage report
+        run: |
+          chmod +x tests/coverage.sh
+          tests/coverage.sh
+
+      - name: Upload coverage report
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-${{ matrix.nvim }}
+          path: luacov.report.html
+
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v4
+        with:
+          files: ./luacov.report.out
+          fail_ci_if_error: true
+          verbose: true
