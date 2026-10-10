@@ -2,18 +2,16 @@ source $KIBI2_REPO_ROOT/tests/common.vim
 
 lua << EOF
   local opts = {
-  	log = {
-		level = vim.log.levels.DEBUG,
-		single_line = true,
-		output = "buffer",
-		buffer_name = "kibi2://log",
-		use_timestamp = true,
-		probe = true,
-		monitor = true,
-  	},
+	level = vim.log.levels.DEBUG,
+	single_line = true,
+	output = "buffer",
+	buffer_name = "kibi2://log",
+	use_timestamp = true,
+	probe = true,
+	monitor = true,
   }
-  require("kibi2.config").setup(opts)
-  log = require("kibi2.logger")
+  require("kibi2.logger").setup(opts)
+  log = require("kibi2.logger.logger")
 EOF
 
 CASE log.xxx(...)

@@ -1,7 +1,7 @@
 --- log file ---
 === MESSAGE ===
  
---- CASE 18: log.xxx(...) ---
+--- CASE 16: log.xxx(...) ---
 
 === DISPLAY ===
 

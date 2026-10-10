@@ -1,7 +1,7 @@
 --- ERROR ---
 === MESSAGE ===
  
---- CASE 8: log ERROR ---
+--- CASE 9: log ERROR ---
 [KB2][ERROR][logger.lua] test case for log.assert ERROR
 
 === DISPLAY ===
