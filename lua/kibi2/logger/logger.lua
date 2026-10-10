@@ -1,6 +1,8 @@
 local api = vim.api -- Neovim
 local bo = vim.bo
 local fn = vim.fn
+local uv = vim.loop
+local levels = vim.log.levels
 
 local config = require("kibi2.logger.config")
 
@@ -8,24 +10,47 @@ local config = require("kibi2.logger.config")
 
 local M = {}
 
-local levels = vim.log.levels
-
 local level_names = {}
 local PREFIX = "KB2"
-local uv = vim.loop
 local queue = {}
 local scheduled = false
 local log_bufnr = nil
-
-for name, value in pairs(levels) do
-	level_names[value] = name
-end
+local initialized = false
 
 local last_mem = 0
 local last_time = uv.hrtime()
 
+local category_hl_map = {}
+local category_match_id = {}
+
+local aug = api.nvim_create_augroup("Kbi2LogHL", { clear = true })
+local assigned = {}
+local used = {}
+local palette = {
+	"#ff5555",
+	"#55aaaa",
+	"#ffff55",
+	"#aaff55",
+	"#aa55ff",
+	"#ffaa55",
+}
+
 -- =============================================================================
 --#region Private
+
+local function initialize()
+	for name, value in pairs(levels) do
+		level_names[value] = name
+	end
+	api.nvim_set_hl(0, "Kibi2Log_Entry", { fg = "#55ffff", bold = true })
+	api.nvim_set_hl(
+		0,
+		"Kibi2Log_Error",
+		{ fg = "#ffffff", bg = "#ff0000", bold = true }
+	)
+	api.nvim_set_hl(0, "Kibi2Log_num", { fg = "#cc55cc", bold = true })
+	api.nvim_set_hl(0, "Kibi2Log_Multi_Byte", { bg = "#664422", bold = true })
+end
 
 ---@return integer
 local function get_tick()
@@ -70,7 +95,6 @@ end
 ---@return string
 local function stringify(value)
 	local v_type = type(value)
-
 	if v_type == "table" then
 		local normalized = normalize_for_log(value)
 		if config.single_line then
@@ -108,6 +132,8 @@ local function get_timestamp()
 	return string.format("[+%.0fms]", delta_ms)
 end
 
+---@param name string
+---@return number|nil
 local function get_bufnr_by_name(name)
 	for _, bufnr in ipairs(api.nvim_list_bufs()) do
 		local buf_name = api.nvim_buf_get_name(bufnr)
@@ -117,17 +143,6 @@ local function get_bufnr_by_name(name)
 	end
 	return nil
 end
-
-local category_hl_map = {}
-local category_match_id = {}
-api.nvim_set_hl(0, "Kibi2Log_Entry", { fg = "#55ffff", bold = true })
-api.nvim_set_hl(
-	0,
-	"Kibi2Log_Error",
-	{ fg = "#ffffff", bg = "#ff0000", bold = true }
-)
-api.nvim_set_hl(0, "Kibi2Log_num", { fg = "#cc55cc", bold = true })
-api.nvim_set_hl(0, "Kibi2Log_Multi_Byte", { bg = "#664422", bold = true })
 
 ---@param bufnr number
 local function apply_log_highlight(bufnr)
@@ -148,7 +163,6 @@ local function apply_log_highlight(bufnr)
 	end)
 end
 
-local aug = api.nvim_create_augroup("Kbi2LogHL", { clear = true })
 ---@param bufnr number
 local function register_autocmds(bufnr)
 	api.nvim_create_autocmd("BufWinEnter", {
@@ -174,7 +188,6 @@ local function ensure_log_buf()
 	---@type number
 	log_bufnr = api.nvim_create_buf(false, true)
 	api.nvim_buf_set_name(log_bufnr, config.buffer_name)
-
 	bo[log_bufnr].buftype = "nofile"
 	bo[log_bufnr].bufhidden = "hide"
 	bo[log_bufnr].swapfile = false
@@ -182,6 +195,7 @@ local function ensure_log_buf()
 	return log_bufnr
 end
 
+---@param buf_string string
 local function flush_buffer(buf_string)
 	local bufnr = ensure_log_buf()
 	api.nvim_buf_set_lines(bufnr, -1, -1, false, vim.split(buf_string, "\n"))
@@ -195,7 +209,7 @@ local function flush_buffer(buf_string)
 	end
 end
 
-local initialized = false
+---@param buf_string string
 local function flush_file(buf_string)
 	local file = config.file_name or "/tmp/kibi2.log"
 	if not initialized then
@@ -238,19 +252,8 @@ local function write_buffer(msg)
 	end
 end
 
-local unpack = table.unpack or unpack -- Lua 5.1/5.2 compatibility
-local palette = {
-	"#ff5555",
-	"#55aaaa",
-	"#ffff55",
-	"#aaff55",
-	"#aa55ff",
-	"#ffaa55",
-}
-
-local assigned = {}
-local used = {}
-
+---@param cat string
+---@return integer
 local function pick_color(cat)
 	if assigned[cat] then
 		return assigned[cat]
@@ -271,30 +274,54 @@ local function pick_color(cat)
 	return color
 end
 
+---@param category string
+---@return string
 local function ensure_category_highlight(category)
 	if category_hl_map[category] then
 		return category_hl_map[category]
 	end
-
 	local hl = "Kibi2Log_" .. category
 	local color = pick_color(category)
-
 	api.nvim_set_hl(0, hl, { fg = color, bold = true })
-
 	category_hl_map[category] = hl
 	return hl
 end
 
+---@param bufnr number
+---@param category string
+---@param hl integer
 local function ensure_match(bufnr, category, hl)
 	if category_match_id[category] then
 		return
 	end
-
 	api.nvim_buf_call(bufnr, function()
 		local pattern = "\\[" .. category .. "\\]"
 		local id = fn.matchadd(hl, pattern)
 		category_match_id[category] = id
 	end)
+end
+
+---@param fmt string
+---@param ... unknown
+---@return string
+local function get_message(fmt, ...)
+	local args = { ... }
+	local message
+	if type(fmt) == "string" or #args == 0 then
+		local ok, result = pcall(function()
+			local unpack = table.unpack or unpack -- Lua 5.1/5.2 compatibility
+			return string.format(fmt, unpack(args))
+		end)
+		if ok then
+			message = result
+		end
+	end
+	if not message then
+		local args = { fmt, ... }
+		local parts = vim.tbl_map(stringify, args)
+		message = table.concat(parts, " ")
+	end
+	return message
 end
 
 ---@param force boolean
@@ -318,21 +345,7 @@ local function emit(force, level, opts, fmt, ...)
 	local info = debug.getinfo(3, "Sl")
 	local file = info and (info.short_src:match("([^/\\]+)$")) or "?"
 	local line = info and info.currentline or 0
-	local args = { ... }
-	local msg
-	if type(fmt) == "string" or #args == 0 then
-		local ok, result = pcall(function()
-			return string.format(fmt, unpack(args))
-		end)
-		if ok then
-			msg = result
-		end
-	end
-	if not msg then
-		local args = { fmt, ... }
-		local parts = vim.tbl_map(stringify, args)
-		msg = table.concat(parts, " ")
-	end
+	local message = get_message(fmt, ...)
 	local ts = get_timestamp()
 	local mon = get_monitor()
 	local name = level_names[level]
@@ -349,7 +362,7 @@ local function emit(force, level, opts, fmt, ...)
 		name,
 		file,
 		line,
-		msg
+		message
 	)
 	if config.output == "buffer" then
 		write_buffer(final)
@@ -417,5 +430,7 @@ function M.assert(condition, message, ...)
 		M.error(message, ...)
 	end
 end
+
+initialize()
 
 return M
