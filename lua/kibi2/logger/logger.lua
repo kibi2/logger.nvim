@@ -21,10 +21,8 @@ for name, value in pairs(levels) do
 	level_names[value] = name
 end
 
-local last_tick = {}
 local last_mem = 0
 local last_time = uv.hrtime()
-local monitoring = false
 
 -- =============================================================================
 --#region Private
@@ -33,18 +31,6 @@ local monitoring = false
 local function get_tick()
 	local bufnr = api.nvim_get_current_buf()
 	return api.nvim_buf_get_changedtick(bufnr)
-end
-
----@return integer
-local function get_delta_tick()
-	local bufnr = api.nvim_get_current_buf()
-	local curr_tick = api.nvim_buf_get_changedtick(bufnr)
-	local prev_tick = last_tick[bufnr]
-	last_tick[bufnr] = curr_tick
-	if not prev_tick then
-		return 0
-	end
-	return curr_tick - prev_tick
 end
 
 ---@return integer
@@ -334,12 +320,15 @@ local function emit(force, level, opts, fmt, ...)
 	local line = info and info.currentline or 0
 	local args = { ... }
 	local msg
-	local ok, result = pcall(function()
-		return string.format(fmt, unpack(args))
-	end)
-	if ok then
-		msg = result
-	else
+	if type(fmt) == "string" or #args == 0 then
+		local ok, result = pcall(function()
+			return string.format(fmt, unpack(args))
+		end)
+		if ok then
+			msg = result
+		end
+	end
+	if not msg then
 		local args = { fmt, ... }
 		local parts = vim.tbl_map(stringify, args)
 		msg = table.concat(parts, " ")
