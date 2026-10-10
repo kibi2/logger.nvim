@@ -54,7 +54,7 @@ end
 
 ---@return string
 local function get_monitor()
-	if not config.log.monitor then
+	if not config.monitor then
 		return ""
 	end
 	local current_mem = get_mem_mb()
@@ -87,7 +87,7 @@ local function stringify(value)
 
 	if v_type == "table" then
 		local normalized = normalize_for_log(value)
-		if config.log.single_line then
+		if config.single_line then
 			return string.format(
 				"<table> %s",
 				vim.inspect(normalized, {
@@ -108,7 +108,7 @@ end
 
 ---@return string
 local function get_timestamp()
-	if not config.log.use_timestamp then
+	if not config.use_timestamp then
 		return ""
 	end
 	local now = uv.hrtime()
@@ -181,13 +181,13 @@ local function ensure_log_buf()
 	if log_bufnr and api.nvim_buf_is_valid(log_bufnr) then
 		return log_bufnr
 	end
-	log_bufnr = get_bufnr_by_name(config.log.buffer_name)
+	log_bufnr = get_bufnr_by_name(config.buffer_name)
 	if log_bufnr then
 		return log_bufnr
 	end
 	---@type number
 	log_bufnr = api.nvim_create_buf(false, true)
-	api.nvim_buf_set_name(log_bufnr, config.log.buffer_name)
+	api.nvim_buf_set_name(log_bufnr, config.buffer_name)
 
 	bo[log_bufnr].buftype = "nofile"
 	bo[log_bufnr].bufhidden = "hide"
@@ -211,7 +211,7 @@ end
 
 local initialized = false
 local function flush_file(buf_string)
-	local file = config.log.file_name or "/tmp/kibi2.log"
+	local file = config.file_name or "/tmp/kibi2.log"
 	if not initialized then
 		local fds = io.open(file, "w")
 		if fds then
@@ -235,9 +235,9 @@ local function flush()
 	end
 	local buf_string = table.concat(queue, "\n")
 	buf_string = buf_string:gsub("\r", "")
-	if config.log.output == "buffer" then
+	if config.output == "buffer" then
 		flush_buffer(buf_string)
-	elseif config.log.output == "file" then
+	elseif config.output == "file" then
 		flush_file(buf_string)
 	end
 	queue = {}
@@ -317,7 +317,7 @@ end
 ---@param fmt any
 ---@param ... unknown
 local function emit(force, level, opts, fmt, ...)
-	if not force and level < config.log.level then
+	if not force and level < config.level then
 		return
 	end
 	if opts == nil or fmt == nil then
@@ -362,11 +362,11 @@ local function emit(force, level, opts, fmt, ...)
 		line,
 		msg
 	)
-	if config.log.output == "buffer" then
+	if config.output == "buffer" then
 		write_buffer(final)
-	elseif config.log.output == "file" then
+	elseif config.output == "file" then
 		write_buffer(final)
-	elseif config.log.output == "print" then
+	elseif config.output == "print" then
 		print(final)
 	end
 end
@@ -397,7 +397,7 @@ end
 
 ---@param ... unknown
 function M.probe(...)
-	if not config.log.probe then
+	if not config.probe then
 		return
 	end
 	emit(true, levels.ERROR, {}, ...)
@@ -406,7 +406,7 @@ end
 ---@param category string
 ---@param ... unknown
 function M.watch(category, ...)
-	if levels.DEBUG < config.log.level then
+	if levels.DEBUG < config.level then
 		return
 	end
 	emit(false, levels.DEBUG, { category = category }, ...)
@@ -414,7 +414,7 @@ end
 
 ---@return boolean
 function M.is_debug()
-	return levels.DEBUG >= config.log.level
+	return levels.DEBUG >= config.level
 end
 
 ---@param condition any

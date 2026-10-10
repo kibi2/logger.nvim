@@ -1,9 +1,10 @@
 source $KIBI2_REPO_ROOT/tests/common.vim
 
-lua require("kibi2.config").setup({})
-lua require("kibi2.config").log.output = "print"
-lua require("kibi2.config").log.level = vim.log.levels.ERROR
-lua log = require("kibi2.logger")
+lua config = require("kibi2.logger.config")
+lua log = require("kibi2.logger.logger")
+lua config.setup({})
+lua config.output = "print"
+lua config.level = vim.log.levels.ERROR
 
 CASE log ERROR
 
@@ -12,8 +13,8 @@ lua log.assert(false, "test case for log.assert ERROR", "bar")
 
 call Snapshot({'desc': 'ERROR' })
 
-lua require("kibi2.config").setup({})
-lua require("kibi2.config").log.level = vim.log.levels.DEBUG
+lua config.setup({})
+lua config.level = vim.log.levels.DEBUG
 
 CASE log trace
 
