@@ -1,11 +1,23 @@
 === MESSAGE ===
  
---- CASE 15: log.xxx(...) ---
-[KB2][ms][ERROR][[string ":lua"]] error
-[KB2][ms][WARN][[string ":lua"]] <boolean> true
-[KB2][ms][DEBUG][[string ":lua"]] 400000000
-[KB2][ms][🟧PRB][[string ":lua"] 1] -0.003
-[KB2][ms][CATEGORY][[string ":lua"]] format 38 foo
+--- CASE 3: log.xxx(...) ---
+[KB2][ms][ERROR][run.lua] error
+[KB2][ms][WARN][run.lua] <boolean> true
+[KB2][ms][WARN][run.lua] <number> 1 <string> 二 <boolean> false <number> 1.414 <table>
+{ 1, 2, 3 }
+[KB2][ms][INFO][run.lua] <table>
+{ "one", 2, "three" }
+[KB2][ms][DEBUG][run.lua] 400000000
+[KB2][ms][CATEGORY][run.lua] format 38 foo
+[KB2][ms][CATEGORY1][run.lua] format 31 bar
+[KB2][ms][CATEGORY2][run.lua] format 32 bar
+[KB2][ms][CATEGORY3][run.lua] format 33 bar
+[KB2][ms][CATEGORY4][run.lua] format 34 bar
+[KB2][ms][CATEGORY5][run.lua] format 35 bar
+[KB2][ms][CATEGORY6][run.lua] format 36 bar
+[KB2][ms][CATEGORY7][run.lua] format 37 bar
+[KB2][ms][CATEGORY8][run.lua] format 38 bar
+[KB2][ms][CATEGORY9][run.lua] format 39 bar
 
 === DISPLAY ===
 

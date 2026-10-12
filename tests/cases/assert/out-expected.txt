@@ -1,8 +1,21 @@
---- ERROR ---
+--- ERROR1 ---
 === MESSAGE ===
  
---- CASE 9: log ERROR ---
-[KB2][ERROR][logger.lua] test case for log.assert ERROR
+--- CASE 3: log ERROR ---
+[ERROR][run1.lua] test case for log.assert ERROR
+
+=== DISPLAY ===
+
+--- ERROR2 ---
+=== MESSAGE ===
+ 
+--- CASE 9: log trace ---
+Error ...
+line   11:
+E5108: ...
+stack traceback:
+	./run2.lua:6: in main chunk
+	[string ":lua"]:1: in main chunk
 
 === DISPLAY ===
 
