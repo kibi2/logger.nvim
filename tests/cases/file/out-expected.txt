@@ -1,14 +1,29 @@
---- log file ---
+--- log file 1 ---
 === MESSAGE ===
  
---- CASE 16: log.xxx(...) ---
+--- CASE 23: log.xxx(...) ---
 
 === DISPLAY ===
 
 
 === FILE ===
-[KB2][ERROR][[string ":lua"]] error
-[KB2][WARN][[string ":lua"]] 3.14
-[KB2][DEBUG][[string ":lua"]] <boolean> false
-[KB2][🟧PRB][[string ":lua"] 1] -0.003
-[KB2][CATEGORY][[string ":lua"]] format 38 foo
+[LG1][ERROR][?] error1
+[LG1][WARN][?] 3.141
+[LG1][DEBUG][?] <boolean> false
+[LG1][🟧PRB][? 0] -0.031
+[LG1][CATEGORY][?] format 31 foo
+[LG1][ERROR][?] error1
+[LG1][WARN][?] 3.141
+[LG1][CATEGORY][?] format 31 foo
+--- log file 2 ---
+
+=== DISPLAY ===
+
+
+=== FILE ===
+[LG2][ERROR][?] error2
+[LG2][WARN][?] 3.142
+[LG2][DEBUG][?] <boolean> true
+[LG2][🟧PRB][? 0] -0.032
+[LG2][CATEGORY][?] format 32 foo
+[LG2][ERROR][?] error2

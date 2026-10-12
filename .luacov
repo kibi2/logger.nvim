@@ -11,5 +11,6 @@ return {
     ".*/.luarocks/.*",
     ".*/site/pack/.*",
     ".*/tests/cases/.*",
+    ".*/lua/kibi2/logger/log$",
   },
 }

@@ -1,0 +1,10 @@
+--- line ---
+=== MESSAGE ===
+[LINE][ERROR][run.lua] error1
+[LINE][WARN][run.lua] 3.141
+[LINE][DEBUG][run.lua] <boolean> false
+[LINE][🟧PRB][run.lua 17] -0.031
+[LINE][CATEGORY][run.lua] format 31 foo
+
+=== DISPLAY ===
+

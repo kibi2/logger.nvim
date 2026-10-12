@@ -1,1 +1,2 @@
-/Users/ogawa/oss/logger.nvim/lua/kibi2/logger/logger.lua:		name = "🟧PRB"
+/Users/ogawa/oss/logger.nvim/lua/kibi2/logger/init.lua:		name = "🟧PRB"
+/Users/ogawa/oss/logger.nvim/tests/cases/print/run.lua:	logger.warn(log, 1, "二", false, 1.414, { 1, 2, 3 })

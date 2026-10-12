@@ -1,6 +1,8 @@
 local M = {}
 
+---@type table<string, any>
 local default_config = {
+	key = "",
 	level = vim.log.levels.ERROR,
 	output = "file", -- "buffer", "file", "print"
 	buffer_name = "kibi2://log",
@@ -11,12 +13,10 @@ local default_config = {
 	monitor = false,
 }
 
+---@param opts table<string, any>
+---@return table<string, any>
 function M.setup(opts)
-	local config =
-		vim.tbl_deep_extend("force", vim.deepcopy(default_config), opts or {})
-	for key, value in pairs(config) do
-		M[key] = value
-	end
+	return vim.tbl_deep_extend("force", vim.deepcopy(default_config), opts)
 end
 
 return M
